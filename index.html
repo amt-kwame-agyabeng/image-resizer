@@ -228,64 +228,40 @@
       }
     });
     
-    async function uploadImage() {
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) return alert("Please select an image");
-
-      const fileName = encodeURIComponent(file.name);
-      const fileType = encodeURIComponent(file.type);
-
-      try {
-        const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
-        const data = await res.json();
-        const uploadUrl = data.uploadUrl;
-
-
-        const upload = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file
-        });
-
-        if (upload.ok) {
-          document.getElementById('fileInput').value = '';
-          document.getElementById('fileName').textContent = '';
-          document.getElementById('fileLabel').textContent = 'Drag & drop image or click to browse';
-          loadImages();
-        } else {
-          alert("Upload failed");
-        }
-      } catch (error) {
-        console.error("Error during upload:", error);
-        alert("Upload failed. Please try again.");
-      }
-    }
-
     async function loadImages() {
-      const gallery = document.getElementById("gallery");
-      gallery.innerHTML = "";
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
 
-      // Replace with real logic or API call to get images
-      const imageKeys = []; // Empty for demo, would be populated from API
-      
-      if (imageKeys.length === 0) {
-        const emptyMessage = document.createElement("div");
-        emptyMessage.className = "gallery-empty";
-        emptyMessage.textContent = "No images uploaded yet";
-        gallery.appendChild(emptyMessage);
-        return;
-      }
+  try {
+    // Replace this URL with your actual deployed API endpoint
+    const response = await fetch("https://ttsavydxeg.execute-api.eu-west-1.amazonaws.com/stage/list-thumbnails");
+    const data = await response.json();
+    const imageKeys = data.images;
 
-      imageKeys.forEach(key => {
-        const img = document.createElement("img");
-        img.src = img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}`;
-        img.alt = "Uploaded photo";
-        img.loading = "lazy";
-        gallery.appendChild(img);
-      });
+    if (!imageKeys || imageKeys.length === 0) {
+      const emptyMessage = document.createElement("div");
+      emptyMessage.className = "gallery-empty";
+      emptyMessage.textContent = "No images uploaded yet";
+      gallery.appendChild(emptyMessage);
+      return;
     }
 
-    // Initialize gallery
+    imageKeys.forEach(key => {
+      const img = document.createElement("img");
+      img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}`;
+      img.alt = "Uploaded photo";
+      img.loading = "lazy";
+      gallery.appendChild(img);
+    });
+  } catch (error) {
+    console.error("Error loading images:", error);
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "gallery-empty";
+    errorMsg.textContent = "Failed to load images.";
+    gallery.appendChild(errorMsg);
+  }
+}
+
     loadImages();
   </script>
 
