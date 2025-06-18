@@ -196,31 +196,23 @@
       opacity: 0.7;
     }
     
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 0.75rem;
-      grid-auto-rows: 8px;
-    }
-    
     .gallery-item {
       position: relative;
       overflow: hidden;
-      border-radius: 8px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
       transition: var(--transition);
       background-color: var(--card-bg);
-      grid-row-end: span 20;
     }
     
     .gallery-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
     }
     
     .gallery img {
       width: 100%;
-      height: 100%;
+      height: 250px;
       object-fit: cover;
       transition: var(--transition);
       display: block;
@@ -246,26 +238,6 @@
       opacity: 1;
     }
     
-    .image-caption {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 0.5rem;
-      color: white;
-      font-size: 0.75rem;
-      opacity: 0;
-      transform: translateY(5px);
-      transition: var(--transition);
-      z-index: 1;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-    
-    .gallery-item:hover .image-caption {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
     .success-message {
       background-color: #d4edda;
       color: #155724;
@@ -286,8 +258,12 @@
       }
       
       .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 0.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+      
+      .gallery img {
+        height: 150px;
       }
     }
   </style>
@@ -313,27 +289,6 @@
   <div class="gallery" id="gallery"></div>
  
   <script>
-    // Function to resize the gallery items for masonry layout
-    function resizeAllGalleryItems() {
-      const allItems = document.getElementsByClassName('gallery-item');
-      for (let i = 0; i < allItems.length; i++) {
-        resizeGalleryItem(allItems[i]);
-      }
-    }
-    
-    // Function to resize a single gallery item
-    function resizeGalleryItem(item) {
-      const img = item.querySelector('img');
-      if (img.complete) {
-        const height = Math.round((img.height / img.width) * 20);
-        item.style.gridRowEnd = `span ${Math.max(height, 16)}`;
-      }
-    }
-    
-    // Initialize masonry layout after images load
-    window.addEventListener('load', resizeAllGalleryItems);
-    window.addEventListener('resize', resizeAllGalleryItems);
-    
     document.getElementById('fileInput').addEventListener('change', function() {
       const fileName = document.getElementById('fileName');
       const fileLabel = document.getElementById('fileLabel');
@@ -428,23 +383,11 @@
       img.loading = "lazy";
       img.dataset.key = key;
       
-      // Create caption
-      const caption = document.createElement("div");
-      caption.className = "image-caption";
-      caption.textContent = "Just uploaded";
-      
-      // Add image and caption to container
+      // Add image to container
       galleryItem.appendChild(img);
-      galleryItem.appendChild(caption);
       
       // Add container to gallery
       gallery.prepend(galleryItem);
-      
-      // Adjust height based on aspect ratio after image loads
-      img.onload = function() {
-        const height = Math.round((this.height / this.width) * 20);
-        galleryItem.style.gridRowEnd = `span ${Math.max(height, 16)}`;
-      };
     }
    
     async function loadImages() {
@@ -493,36 +436,11 @@
         gallery.innerHTML = "";
         
         imageKeys.forEach(key => {
-          // Create gallery item container
-          const galleryItem = document.createElement("div");
-          galleryItem.className = "gallery-item";
-          
-          // Create image
           const img = document.createElement("img");
           img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`;
           img.alt = "Uploaded photo";
           img.loading = "lazy";
-          
-          // Create caption
-          const caption = document.createElement("div");
-          caption.className = "image-caption";
-          
-          // Extract filename from key for caption
-          const filename = decodeURIComponent(key.split('/').pop().split('?')[0]);
-          caption.textContent = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
-          
-          // Add image and caption to container
-          galleryItem.appendChild(img);
-          galleryItem.appendChild(caption);
-          
-          // Add container to gallery
-          gallery.appendChild(galleryItem);
-          
-          // Adjust height based on aspect ratio after image loads
-          img.onload = function() {
-            const height = Math.round((this.height / this.width) * 20);
-            galleryItem.style.gridRowEnd = `span ${Math.max(height, 16)}`;
-          };
+          gallery.appendChild(img);
         });
 
       } catch (error) {
