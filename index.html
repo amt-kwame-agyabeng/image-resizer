@@ -250,47 +250,13 @@
         });
 
         if (upload.ok) {
-          // Reset the file input
           document.getElementById('fileInput').value = '';
           document.getElementById('fileName').textContent = '';
           document.getElementById('fileLabel').textContent = 'Drag & drop image or click to browse';
-          
-          // Show temporary success message
-          const successMessage = document.createElement("div");
-          successMessage.style.color = "#4CAF50";
-          successMessage.style.marginTop = "10px";
-          successMessage.style.fontWeight = "500";
-          successMessage.textContent = "Upload successful! Processing image...";
-          document.querySelector('.file-input-container').appendChild(successMessage);
-          
-          // Add the uploaded image to the gallery immediately with a local preview
-          const localPreview = URL.createObjectURL(file);
-          addImageToGallery(fileName, localPreview);
-          
-          // Try multiple times to refresh the gallery to get the processed image
-          let attempts = 0;
-          const maxAttempts = 3;
-          
-          function attemptRefresh() {
-            setTimeout(() => {
-              loadImages();
-              attempts++;
-              
-              if (attempts < maxAttempts) {
-                attemptRefresh();
-              } else {
-                // Update message when done with attempts
-                successMessage.textContent = "Upload complete!";
-                // Remove message after showing completion
-                setTimeout(() => {
-                  successMessage.remove();
-                }, 2000);
-              }
-            }, 2000); // Wait 2 seconds between attempts
-          }
-          
-          // Start the refresh attempts
-          attemptRefresh();
+
+          setTimeout(() => {
+            loadImages();
+          }, 2000); // wait 1 second before reloading images
         } else {
           alert("Upload failed");
         }
@@ -300,95 +266,40 @@
       }
     }
 
-   // Function to add a single image to the gallery
-   function addImageToGallery(key, src) {
-     const gallery = document.getElementById("gallery");
-     
-     // Remove "no images" message if it exists
-     const emptyMessage = gallery.querySelector(".gallery-empty");
-     if (emptyMessage) {
-       emptyMessage.remove();
-     }
-     
-     // Create and add the image
-     const img = document.createElement("img");
-     img.src = src;
-     img.alt = "Uploaded photo";
-     img.loading = "lazy";
-     img.dataset.key = key; // Store the key for potential updates
-     gallery.prepend(img); // Add to the beginning of gallery
-   }
-   
    async function loadImages() {
-     const gallery = document.getElementById("gallery");
-     
-     // Keep track of local previews
-     const localPreviews = [];
-     gallery.querySelectorAll("img").forEach(img => {
-       if (img.dataset.key) {
-         localPreviews.push({
-           key: img.dataset.key,
-           element: img
-         });
-       }
-     });
-     
-     // Show loading indicator only if gallery is empty
-     if (!gallery.querySelector("img")) {
-       gallery.innerHTML = "<div class='gallery-empty' style='font-style:normal;'>Loading images...</div>";
-     }
+   const gallery = document.getElementById("gallery");
+   gallery.innerHTML = "";
 
-    try {
-      // Add cache-busting parameter to prevent caching
-      const cacheBuster = Date.now();
-      const response = await fetch(`https://ttsavydxeg.execute-api.eu-west-1.amazonaws.com/stage/ListThumbnails?_=${cacheBuster}`);
-      const data = await response.json();
-      console.log("API response:", data);
+  try {
+    const response = await fetch("https://ttsavydxeg.execute-api.eu-west-1.amazonaws.com/stage/ListThumbnails");
+    const data = await response.json();
+    console.log("API response:", data);
 
-      // Clear gallery after successful fetch, but preserve local previews
-      if (!gallery.querySelector("img")) {
-        gallery.innerHTML = "";
-      } else {
-        // Only remove the loading message if it exists
-        const loadingMsg = gallery.querySelector(".gallery-empty");
-        if (loadingMsg) loadingMsg.remove();
-      }
-      
-      const imageKeys = data.images; // MUST match 'images' in Lambda
+    const imageKeys = data.images; // MUST match 'images' in Lambda
 
-      if (!imageKeys || imageKeys.length === 0) {
-        // Only show empty message if there are no local previews
-        if (!gallery.querySelector("img")) {
-          const emptyMessage = document.createElement("div");
-          emptyMessage.className = "gallery-empty";
-          emptyMessage.textContent = "No images uploaded yet";
-          gallery.appendChild(emptyMessage);
-        }
-        return;
-      }
-
-      // Clear gallery to rebuild with latest images
-      gallery.innerHTML = "";
-      
-      imageKeys.forEach(key => {
-        const img = document.createElement("img");
-        // Add cache-busting parameter to force browser to fetch the latest version
-        img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`;
-        img.alt = "Uploaded photo";
-        img.loading = "lazy";
-        gallery.appendChild(img);
-      });
-
-    } catch (error) {
-      console.error("Error loading images:", error);
-      // Only show error if gallery is empty
-      if (!gallery.querySelector("img")) {
-        const errorMsg = document.createElement("div");
-        errorMsg.className = "gallery-empty";
-        errorMsg.textContent = "Failed to load images.";
-        gallery.appendChild(errorMsg);
-      }
+    if (!imageKeys || imageKeys.length === 0) {
+      const emptyMessage = document.createElement("div");
+      emptyMessage.className = "gallery-empty";
+      emptyMessage.textContent = "No images uploaded yet";
+      gallery.appendChild(emptyMessage);
+      return;
     }
+
+    imageKeys.forEach(key => {
+      const img = document.createElement("img");
+      img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${Date.now()}`;
+      img.alt = "Uploaded photo";
+      img.loading = "lazy";
+      gallery.appendChild(img);
+    });
+
+  } catch (error) {
+    console.error("Error loading images:", error);
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "gallery-empty";
+    errorMsg.textContent = "Failed to load images.";
+    gallery.appendChild(errorMsg);
+  }
 }
 
 // Initialize gallery
