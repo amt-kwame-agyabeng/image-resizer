@@ -5,50 +5,185 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Photo Sharing App</title>
   <style>
+    :root {
+      --primary: #3a86ff;
+      --primary-dark: #2667cc;
+      --text: #333;
+      --text-light: #666;
+      --bg: #f8f9fa;
+      --card-bg: #fff;
+      --border-radius: 12px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: sans-serif;
-      background-color: #f2f2f2;
-      max-width: 700px;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      max-width: 900px;
       margin: 0 auto;
       padding: 2rem;
     }
+    
     h1 {
       text-align: center;
-      color: #333;
-    }
-    .upload-box {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-weight: 600;
+      font-size: 2.2rem;
       margin-bottom: 2rem;
+      color: var(--text);
+      letter-spacing: -0.5px;
     }
-    .upload-box input[type="file"] {
-      display: block;
-      margin-bottom: 1rem;
+    
+    .upload-box {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-    .gallery img {
+    
+    .file-input-container {
+      position: relative;
       width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 6px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
+    
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background-color: #f0f4f8;
+      border: 2px dashed #ccd7e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      height: 100px;
+      width: 100%;
+    }
+    
+    .file-input-label:hover {
+      background-color: #e6edf5;
+      border-color: var(--primary);
+    }
+    
+    .file-input-label span {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+    
+    #fileInput {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+    
+    .file-name {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+    
     button {
-      padding: 0.6rem 1.2rem;
-      background-color: #3498db;
+      padding: 0.8rem 2rem;
+      background-color: var(--primary);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: var(--transition);
+      min-width: 160px;
     }
+    
     button:hover {
-      background-color: #2980b9;
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .gallery-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .gallery-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      color: var(--text-light);
+      font-style: italic;
+      box-shadow: var(--shadow);
+    }
+    
+    .gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    
+    .gallery img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .upload-box {
+        padding: 1.5rem;
+      }
+      
+      .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+      
+      .gallery img {
+        height: 150px;
+      }
     }
   </style>
 </head>
@@ -57,13 +192,36 @@
   <h1>Photo Sharing App</h1>
 
   <div class="upload-box">
-    <input type="file" id="fileInput" accept="image/*"/>
+    <div class="file-input-container">
+      <label for="fileInput" class="file-input-label">
+        <span id="fileLabel">Drag & drop image or click to browse</span>
+      </label>
+      <input type="file" id="fileInput" accept="image/*"/>
+      <div class="file-name" id="fileName"></div>
+    </div>
     <button onclick="uploadImage()">Upload Image</button>
   </div>
 
+  <div class="gallery-header">
+    <h2 class="gallery-title">Gallery</h2>
+  </div>
   <div class="gallery" id="gallery"></div>
 
   <script>
+    // Update file name display when file is selected
+    document.getElementById('fileInput').addEventListener('change', function() {
+      const fileName = document.getElementById('fileName');
+      const fileLabel = document.getElementById('fileLabel');
+      
+      if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+        fileLabel.textContent = 'Image selected';
+      } else {
+        fileName.textContent = '';
+        fileLabel.textContent = 'Drag & drop image or click to browse';
+      }
+    });
+    
     async function uploadImage() {
       const file = document.getElementById('fileInput').files[0];
       if (!file) return alert("Please select an image");
@@ -71,21 +229,28 @@
       const fileName = encodeURIComponent(file.name);
       const fileType = encodeURIComponent(file.type);
 
-      const res = await fetch(`https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
-      const data = await res.json();
-      const uploadUrl = data.url;
+      try {
+        const res = await fetch(`https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
+        const data = await res.json();
+        const uploadUrl = data.url;
 
-      const upload = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file
-      });
+        const upload = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
 
-      if (upload.ok) {
-        alert("Uploaded!");
-        loadImages();
-      } else {
-        alert("Upload failed");
+        if (upload.ok) {
+          document.getElementById('fileInput').value = '';
+          document.getElementById('fileName').textContent = '';
+          document.getElementById('fileLabel').textContent = 'Drag & drop image or click to browse';
+          loadImages();
+        } else {
+          alert("Upload failed");
+        }
+      } catch (error) {
+        console.error("Error during upload:", error);
+        alert("Upload failed. Please try again.");
       }
     }
 
@@ -93,15 +258,27 @@
       const gallery = document.getElementById("gallery");
       gallery.innerHTML = "";
 
-      const imageKeys = ["thumb-example.jpg"]; // Replace with real logic or API
+      // Replace with real logic or API call to get images
+      const imageKeys = []; // Empty for demo, would be populated from API
+      
+      if (imageKeys.length === 0) {
+        const emptyMessage = document.createElement("div");
+        emptyMessage.className = "gallery-empty";
+        emptyMessage.textContent = "No images uploaded yet";
+        gallery.appendChild(emptyMessage);
+        return;
+      }
 
       imageKeys.forEach(key => {
         const img = document.createElement("img");
         img.src = `https://photo-sharing-thumbnails.s3.amazonaws.com/${key}`;
+        img.alt = "Uploaded photo";
+        img.loading = "lazy";
         gallery.appendChild(img);
       });
     }
 
+    // Initialize gallery
     loadImages();
   </script>
 
