@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Photo Sharing App</title>
+</head>
+<body>
+  <h1>Upload an Image</h1>
+  <input type="file" id="uploadFile">
+  <button onclick="uploadImage()">Upload</button>
+
+  <h2>Gallery</h2>
+  <div id="gallery"></div>
+
+  <script>
+    async function uploadImage() {
+      let fileInput = document.getElementById("uploadFile");
+      let file = fileInput.files[0];
+      let fileName = encodeURIComponent(file.name);
+
+      let uploadUrl = `https://photo-sharing-app-dev-bucket.s3.amazonaws.com/${fileName}`;
+
+      let response = await fetch(uploadUrl, {
+        method: "PUT",
+        body: file
+      });
+
+      if (response.ok) {
+        alert("Uploaded successfully!");
+        displayImages();
+      }
+    }
+
+    async function displayImages() {
+      let gallery = document.getElementById("gallery");
+      gallery.innerHTML = "";
+
+      let imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-sample.jpg";
+
+      let imgElement = `<img src="${imageUrl}" width="150" height="150">`;
+      gallery.innerHTML += imgElement;
+    }
+
+    displayImages();
+  </script>
+</body>
+</html>
