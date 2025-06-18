@@ -230,7 +230,7 @@
       const fileType = encodeURIComponent(file.type);
 
       try {
-        const res = await fetch(`https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
+        const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
         const data = await res.json();
         const uploadUrl = data.url;
 
