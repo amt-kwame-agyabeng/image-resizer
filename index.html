@@ -1,208 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Photo Sharing App</title>
   <style>
     body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      max-width: 800px;
+      font-family: sans-serif;
+      background-color: #f2f2f2;
+      max-width: 700px;
       margin: 0 auto;
       padding: 2rem;
-      color: #333;
-      line-height: 1.6;
-      background-color: #f9f9f9;
     }
-    
-    .empty-gallery {
-      text-align: center;
-      color: #999;
-      padding: 2rem;
-      background-color: white;
-      border-radius: 8px;
-      font-style: italic;
-    }
-    
     h1 {
-      font-weight: 300;
-      color: #444;
-      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #333;
     }
-    
-    .upload-container {
-      background-color: white;
-      border-radius: 8px;
+    .upload-box {
+      background: #fff;
       padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
-    
-    .file-input-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .upload-box input[type="file"] {
+      display: block;
       margin-bottom: 1rem;
     }
-    
-    .custom-file-input {
-      position: relative;
-      display: inline-block;
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
     }
-    
-    .custom-file-input input[type="file"] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
+    .gallery img {
       width: 100%;
-      height: 100%;
-      cursor: pointer;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
-    
-    .file-button {
-      background-color: #f0f0f0;
-      color: #555;
-      padding: 0.6rem 1.2rem;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: inline-block;
-    }
-    
-    .file-name {
-      margin-left: 10px;
-      font-size: 0.9rem;
-      color: #777;
-    }
-    
     button {
+      padding: 0.6rem 1.2rem;
       background-color: #3498db;
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.2s;
     }
-    
     button:hover {
       background-color: #2980b9;
-    }
-    
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-    }
-    
-    .gallery img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 4px;
-      transition: transform 0.2s;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .gallery img:hover {
-      transform: scale(1.03);
-    }
-    
-    .section-title {
-      font-weight: 400;
-      color: #555;
-      margin: 2rem 0 1rem;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.5rem;
     }
   </style>
 </head>
 <body>
+
   <h1>Photo Sharing App</h1>
-  
-  <div class="upload-container">
-    <div class="file-input-wrapper">
-      <div class="custom-file-input">
-        <div class="file-button">Choose Image</div>
-        <input type="file" id="uploadFile" accept="image/*">
-      </div>
-      <span class="file-name" id="fileName">No file selected</span>
-      <button onclick="uploadImage()">Upload</button>
-    </div>
+
+  <div class="upload-box">
+    <input type="file" id="fileInput" accept="image/*"/>
+    <button onclick="uploadImage()">Upload Image</button>
   </div>
 
-  <h2 class="section-title">Gallery</h2>
-  <div id="gallery" class="gallery"></div>
+  <div class="gallery" id="gallery"></div>
 
- <script>
-  document.getElementById("uploadFile").addEventListener("change", function () {
-    const fileNameElement = document.getElementById("fileName");
-    fileNameElement.textContent = this.files.length > 0 ? this.files[0].name : "No file selected";
-  });
+  <script>
+    async function uploadImage() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return alert("Please select an image");
 
-  async function uploadImage() {
-    const fileInput = document.getElementById("uploadFile");
-    const file = fileInput.files[0];
+      const fileName = encodeURIComponent(file.name);
+      const fileType = encodeURIComponent(file.type);
 
-    if (!file) {
-      alert("Please select an image to upload");
-      return;
+      const res = await fetch(`https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
+      const data = await res.json();
+      const uploadUrl = data.url;
+
+      const upload = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+
+      if (upload.ok) {
+        alert("Uploaded!");
+        loadImages();
+      } else {
+        alert("Upload failed");
+      }
     }
 
-    const fileName = encodeURIComponent(file.name);
-    const fileType = encodeURIComponent(file.type);
+    async function loadImages() {
+      const gallery = document.getElementById("gallery");
+      gallery.innerHTML = "";
 
-    // Step 1: Fetch signed URL from API Gateway
-    const response = await fetch(`https://2fspz3q3g5.execute-api.eu-west-1.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
-    const data = await response.json();
-    const uploadUrl = data.url;
+      const imageKeys = ["thumb-example.jpg"]; // Replace with real logic or API
 
-    // Step 2: Upload file to S3 using signed URL
-    const upload = await fetch(uploadUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": file.type
-      },
-      body: file
-    });
-
-    if (upload.ok) {
-      alert("Upload successful!");
-      displayImages();
-    } else {
-      alert("Upload failed.");
-      console.error(await upload.text());
+      imageKeys.forEach(key => {
+        const img = document.createElement("img");
+        img.src = `https://photo-sharing-thumbnails.s3.amazonaws.com/${key}`;
+        gallery.appendChild(img);
+      });
     }
-  }
 
-  async function displayImages() {
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
-
-    // This would typically come from an API that lists your images
-    // For now we're just checking if we have any images to display
-    const hasImages = false; // Change this when you have actual image data
-    
-    if (hasImages) {
-      // Example image - in a real app, you'd loop through your images
-      const imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-gettyimages-974056938-1024x1024.jpeg";
-      const imgElement = document.createElement("img");
-      imgElement.src = imageUrl;
-      imgElement.alt = "Uploaded photo";
-      gallery.appendChild(imgElement);
-    } else {
-      const emptyMessage = document.createElement("div");
-      emptyMessage.className = "empty-gallery";
-      emptyMessage.textContent = "No images uploaded yet";
-      gallery.appendChild(emptyMessage);
-    }
-  }
-
-  displayImages();
-</script>
+    loadImages();
+  </script>
 
 </body>
 </html>
