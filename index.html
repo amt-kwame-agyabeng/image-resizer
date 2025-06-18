@@ -228,6 +228,39 @@
       }
     });
     
+    async function uploadImage() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return alert("Please select an image");
+
+      const fileName = encodeURIComponent(file.name);
+      const fileType = encodeURIComponent(file.type);
+
+      try {
+        const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
+        const data = await res.json();
+        const uploadUrl = data.uploadUrl;
+
+
+        const upload = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+
+        if (upload.ok) {
+          document.getElementById('fileInput').value = '';
+          document.getElementById('fileName').textContent = '';
+          document.getElementById('fileLabel').textContent = 'Drag & drop image or click to browse';
+          loadImages();
+        } else {
+          alert("Upload failed");
+        }
+      } catch (error) {
+        console.error("Error during upload:", error);
+        alert("Upload failed. Please try again.");
+      }
+    }
+
     async function loadImages() {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
@@ -253,6 +286,7 @@
       img.loading = "lazy";
       gallery.appendChild(img);
     });
+
   } catch (error) {
     console.error("Error loading images:", error);
     const errorMsg = document.createElement("div");
@@ -262,7 +296,11 @@
   }
 }
 
-    loadImages();
+// Initialize gallery
+loadImages();
+
+
+    
   </script>
 
 </body>
