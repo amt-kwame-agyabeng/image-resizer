@@ -17,7 +17,7 @@
       let file = fileInput.files[0];
       let fileName = encodeURIComponent(file.name);
 
-      let uploadUrl = `https://photo-sharing-app-dev-bucket.s3.amazonaws.com/${fileName}`;
+      let uploadUrl = `https://photo-sharing-app-bucket-dev.s3.amazonaws.com/${fileName}`;
 
       let response = await fetch(uploadUrl, {
         method: "PUT",
