@@ -148,25 +148,39 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     
     .gallery-title {
       font-size: 1.5rem;
       font-weight: 500;
       color: var(--text);
+      position: relative;
+    }
+    
+    .gallery-title:after {
+      content: "";
+      position: absolute;
+      bottom: -0.75rem;
+      left: 0;
+      width: 3rem;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 2px;
     }
     
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 1.5rem;
     }
     
     .gallery-empty {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem;
+      padding: 4rem 2rem;
       background: var(--card-bg);
       border-radius: var(--border-radius);
       color: var(--text-light);
@@ -177,22 +191,79 @@
     .gallery-empty:before {
       content: "🖼️";
       display: block;
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+    
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      grid-auto-rows: 10px;
+    }
+    
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      background-color: var(--card-bg);
+      grid-row-end: span 25;
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
     }
     
     .gallery img {
       width: 100%;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
+      transition: var(--transition);
+      display: block;
+    }
+    
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .gallery-item:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+      opacity: 0;
       transition: var(--transition);
     }
     
-    .gallery img:hover {
-      transform: scale(1.03);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    .gallery-item:hover:after {
+      opacity: 1;
+    }
+    
+    .image-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      color: white;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: var(--transition);
+      z-index: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    
+    .gallery-item:hover .image-caption {
+      opacity: 1;
+      transform: translateY(0);
     }
     
     .success-message {
@@ -246,6 +317,27 @@
   <div class="gallery" id="gallery"></div>
  
   <script>
+    // Function to resize the gallery items for masonry layout
+    function resizeAllGalleryItems() {
+      const allItems = document.getElementsByClassName('gallery-item');
+      for (let i = 0; i < allItems.length; i++) {
+        resizeGalleryItem(allItems[i]);
+      }
+    }
+    
+    // Function to resize a single gallery item
+    function resizeGalleryItem(item) {
+      const img = item.querySelector('img');
+      if (img.complete) {
+        const height = Math.round((img.height / img.width) * 25);
+        item.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+      }
+    }
+    
+    // Initialize masonry layout after images load
+    window.addEventListener('load', resizeAllGalleryItems);
+    window.addEventListener('resize', resizeAllGalleryItems);
+    
     document.getElementById('fileInput').addEventListener('change', function() {
       const fileName = document.getElementById('fileName');
       const fileLabel = document.getElementById('fileLabel');
@@ -329,13 +421,34 @@
         emptyMessage.remove();
       }
       
+      // Create gallery item container
+      const galleryItem = document.createElement("div");
+      galleryItem.className = "gallery-item";
+      
       // Create and add the image
       const img = document.createElement("img");
       img.src = src;
       img.alt = "Uploaded photo";
       img.loading = "lazy";
       img.dataset.key = key;
-      gallery.prepend(img);
+      
+      // Create caption
+      const caption = document.createElement("div");
+      caption.className = "image-caption";
+      caption.textContent = "Just uploaded";
+      
+      // Add image and caption to container
+      galleryItem.appendChild(img);
+      galleryItem.appendChild(caption);
+      
+      // Add container to gallery
+      gallery.prepend(galleryItem);
+      
+      // Adjust height based on aspect ratio after image loads
+      img.onload = function() {
+        const height = Math.round((this.height / this.width) * 25);
+        galleryItem.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+      };
     }
    
     async function loadImages() {
@@ -384,11 +497,36 @@
         gallery.innerHTML = "";
         
         imageKeys.forEach(key => {
+          // Create gallery item container
+          const galleryItem = document.createElement("div");
+          galleryItem.className = "gallery-item";
+          
+          // Create image
           const img = document.createElement("img");
           img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`;
           img.alt = "Uploaded photo";
           img.loading = "lazy";
-          gallery.appendChild(img);
+          
+          // Create caption
+          const caption = document.createElement("div");
+          caption.className = "image-caption";
+          
+          // Extract filename from key for caption
+          const filename = decodeURIComponent(key.split('/').pop().split('?')[0]);
+          caption.textContent = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+          
+          // Add image and caption to container
+          galleryItem.appendChild(img);
+          galleryItem.appendChild(caption);
+          
+          // Add container to gallery
+          gallery.appendChild(galleryItem);
+          
+          // Adjust height based on aspect ratio after image loads
+          img.onload = function() {
+            const height = Math.round((this.height / this.width) * 25);
+            galleryItem.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+          };
         });
 
       } catch (error) {
