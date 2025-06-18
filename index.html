@@ -212,8 +212,10 @@
     <h2 class="gallery-title">Gallery</h2>
   </div>
   <div class="gallery" id="gallery"></div>
-
+ 
+ 
   <script>
+    console.log("Script loaded");
     // Update file name display when file is selected
     document.getElementById('fileInput').addEventListener('change', function() {
       const fileName = document.getElementById('fileName');
@@ -261,15 +263,16 @@
       }
     }
 
-    async function loadImages() {
+   async function loadImages() {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
 
   try {
-    // Replace this URL with your actual deployed API endpoint
     const response = await fetch("https://ttsavydxeg.execute-api.eu-west-1.amazonaws.com/stage/ListThumbnails");
     const data = await response.json();
-    const imageKeys = data.images;
+    console.log("API response:", data);
+
+    const imageKeys = data.images; // MUST match 'images' in Lambda
 
     if (!imageKeys || imageKeys.length === 0) {
       const emptyMessage = document.createElement("div");
