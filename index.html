@@ -198,24 +198,24 @@
     
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-      grid-auto-rows: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      grid-auto-rows: 8px;
     }
     
     .gallery-item {
       position: relative;
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: 8px;
       box-shadow: var(--shadow);
       transition: var(--transition);
       background-color: var(--card-bg);
-      grid-row-end: span 25;
+      grid-row-end: span 20;
     }
     
     .gallery-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
     
     .gallery img {
@@ -251,14 +251,14 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 1rem;
+      padding: 0.5rem;
       color: white;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(5px);
       transition: var(--transition);
       z-index: 1;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
     
     .gallery-item:hover .image-caption {
@@ -286,12 +286,8 @@
       }
       
       .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-      }
-      
-      .gallery img {
-        height: 150px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
       }
     }
   </style>
@@ -329,8 +325,8 @@
     function resizeGalleryItem(item) {
       const img = item.querySelector('img');
       if (img.complete) {
-        const height = Math.round((img.height / img.width) * 25);
-        item.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+        const height = Math.round((img.height / img.width) * 20);
+        item.style.gridRowEnd = `span ${Math.max(height, 16)}`;
       }
     }
     
@@ -446,8 +442,8 @@
       
       // Adjust height based on aspect ratio after image loads
       img.onload = function() {
-        const height = Math.round((this.height / this.width) * 25);
-        galleryItem.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+        const height = Math.round((this.height / this.width) * 20);
+        galleryItem.style.gridRowEnd = `span ${Math.max(height, 16)}`;
       };
     }
    
@@ -524,8 +520,8 @@
           
           // Adjust height based on aspect ratio after image loads
           img.onload = function() {
-            const height = Math.round((this.height / this.width) * 25);
-            galleryItem.style.gridRowEnd = `span ${Math.max(height, 20)}`;
+            const height = Math.round((this.height / this.width) * 20);
+            galleryItem.style.gridRowEnd = `span ${Math.max(height, 16)}`;
           };
         });
 
