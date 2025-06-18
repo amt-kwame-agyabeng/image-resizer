@@ -278,7 +278,7 @@
 
       imageKeys.forEach(key => {
         const img = document.createElement("img");
-        img.src = `https://photo-sharing-thumbnails.s3.amazonaws.com/${key}`;
+        img.src = img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}`;
         img.alt = "Uploaded photo";
         img.loading = "lazy";
         gallery.appendChild(img);
