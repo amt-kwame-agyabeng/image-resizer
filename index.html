@@ -128,55 +128,60 @@
   <h2 class="section-title">Gallery</h2>
   <div id="gallery" class="gallery"></div>
 
-  <script>
-    // Update file name display when a file is selected
-    document.getElementById("uploadFile").addEventListener("change", function() {
-      const fileNameElement = document.getElementById("fileName");
-      if (this.files.length > 0) {
-        fileNameElement.textContent = this.files[0].name;
-      } else {
-        fileNameElement.textContent = "No file selected";
-      }
+ <script>
+  document.getElementById("uploadFile").addEventListener("change", function () {
+    const fileNameElement = document.getElementById("fileName");
+    fileNameElement.textContent = this.files.length > 0 ? this.files[0].name : "No file selected";
+  });
+
+  async function uploadImage() {
+    const fileInput = document.getElementById("uploadFile");
+    const file = fileInput.files[0];
+
+    if (!file) {
+      alert("Please select an image to upload");
+      return;
+    }
+
+    const fileName = encodeURIComponent(file.name);
+    const fileType = encodeURIComponent(file.type);
+
+    // Step 1: Fetch signed URL from API Gateway
+    const response = await fetch(`https://2fspz3q3g5.execute-api.eu-west-1.amazonaws.com/test/get-upload-url?name=${fileName}&type=${fileType}`);
+    const data = await response.json();
+    const uploadUrl = data.url;
+
+    // Step 2: Upload file to S3 using signed URL
+    const upload = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type
+      },
+      body: file
     });
-    
-    async function uploadImage() {
-      let fileInput = document.getElementById("uploadFile");
-      let file = fileInput.files[0];
-      
-      if (!file) {
-        alert("Please select an image to upload");
-        return;
-      }
-      
-      let fileName = encodeURIComponent(file.name);
-      let uploadUrl = `https://photo-sharing-app-bucket-dev.s3.amazonaws.com/${fileName}`;
 
-      try {
-        let response = await fetch(uploadUrl, {
-          method: "PUT",
-          body: file
-        });
-
-        if (response.ok) {
-          displayImages();
-        }
-      } catch (error) {
-        console.error("Upload failed:", error);
-      }
+    if (upload.ok) {
+      alert("Upload successful!");
+      displayImages();
+    } else {
+      alert("Upload failed.");
+      console.error(await upload.text());
     }
+  }
 
-    async function displayImages() {
-      let gallery = document.getElementById("gallery");
-      gallery.innerHTML = "";
+  async function displayImages() {
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
 
-      let imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-gettyimages-974056938-1024x1024.jpeg";
-      let imgElement = document.createElement("img");
-      imgElement.src = imageUrl;
-      imgElement.alt = "Uploaded photo";
-      gallery.appendChild(imgElement);
-    }
+    const imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-gettyimages-974056938-1024x1024.jpeg";
+    const imgElement = document.createElement("img");
+    imgElement.src = imageUrl;
+    imgElement.alt = "Uploaded photo";
+    gallery.appendChild(imgElement);
+  }
 
-    displayImages();
-  </script>
+  displayImages();
+</script>
+
 </body>
 </html>
