@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Photo Sharing App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #3a86ff;
@@ -24,19 +27,20 @@
     }
     
     body {
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
       max-width: 900px;
       margin: 0 auto;
       padding: 2rem;
+      font-weight: 300;
     }
     
     h1 {
       text-align: center;
-      font-weight: 600;
-      font-size: 2.2rem;
+      font-weight: 500;
+      font-size: 2.4rem;
       margin-bottom: 2rem;
       color: var(--text);
       letter-spacing: -0.5px;
@@ -107,10 +111,12 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 400;
       font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
       transition: var(--transition);
       min-width: 160px;
+      letter-spacing: 0.5px;
     }
     
     button:hover {
@@ -232,7 +238,8 @@
       try {
         const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
         const data = await res.json();
-        const uploadUrl = data.url;
+        const uploadUrl = data.uploadUrl;
+
 
         const upload = await fetch(uploadUrl, {
           method: "PUT",
