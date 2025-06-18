@@ -15,6 +15,15 @@
       background-color: #f9f9f9;
     }
     
+    .empty-gallery {
+      text-align: center;
+      color: #999;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      font-style: italic;
+    }
+    
     h1 {
       font-weight: 300;
       color: #444;
@@ -173,11 +182,23 @@
     const gallery = document.getElementById("gallery");
     gallery.innerHTML = "";
 
-    const imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-gettyimages-974056938-1024x1024.jpeg";
-    const imgElement = document.createElement("img");
-    imgElement.src = imageUrl;
-    imgElement.alt = "Uploaded photo";
-    gallery.appendChild(imgElement);
+    // This would typically come from an API that lists your images
+    // For now we're just checking if we have any images to display
+    const hasImages = false; // Change this when you have actual image data
+    
+    if (hasImages) {
+      // Example image - in a real app, you'd loop through your images
+      const imageUrl = "https://photo-sharing-thumbnails-dev.s3.amazonaws.com/thumb-gettyimages-974056938-1024x1024.jpeg";
+      const imgElement = document.createElement("img");
+      imgElement.src = imageUrl;
+      imgElement.alt = "Uploaded photo";
+      gallery.appendChild(imgElement);
+    } else {
+      const emptyMessage = document.createElement("div");
+      emptyMessage.className = "empty-gallery";
+      emptyMessage.textContent = "No images uploaded yet";
+      gallery.appendChild(emptyMessage);
+    }
   }
 
   displayImages();
