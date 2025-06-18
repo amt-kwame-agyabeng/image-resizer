@@ -36,6 +36,38 @@
       margin-bottom: 1rem;
     }
     
+    .custom-file-input {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .custom-file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-button {
+      background-color: #f0f0f0;
+      color: #555;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-block;
+    }
+    
+    .file-name {
+      margin-left: 10px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    
     button {
       background-color: #3498db;
       color: white;
@@ -84,7 +116,11 @@
   
   <div class="upload-container">
     <div class="file-input-wrapper">
-      <input type="file" id="uploadFile" accept="image/*">
+      <div class="custom-file-input">
+        <div class="file-button">Choose Image</div>
+        <input type="file" id="uploadFile" accept="image/*">
+      </div>
+      <span class="file-name" id="fileName">No file selected</span>
       <button onclick="uploadImage()">Upload</button>
     </div>
   </div>
@@ -93,6 +129,16 @@
   <div id="gallery" class="gallery"></div>
 
   <script>
+    // Update file name display when a file is selected
+    document.getElementById("uploadFile").addEventListener("change", function() {
+      const fileNameElement = document.getElementById("fileName");
+      if (this.files.length > 0) {
+        fileNameElement.textContent = this.files[0].name;
+      } else {
+        fileNameElement.textContent = "No file selected";
+      }
+    });
+    
     async function uploadImage() {
       let fileInput = document.getElementById("uploadFile");
       let file = fileInput.files[0];
