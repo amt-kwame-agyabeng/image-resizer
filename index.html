@@ -3,107 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Minimal Gallery</title>
+  <title>Photo Sharing App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fafafa;
-      --text: #171717;
-      --text-light: #737373;
-      --accent: #0ea5e9;
-      --accent-light: #e0f2fe;
+      --primary: #0070f3;
+      --primary-light: #e1ebf8;
+      --text: #111827;
+      --text-light: #6b7280;
+      --bg: #f9fafb;
+      --card-bg: #fff;
       --border: #e5e7eb;
-      --card-bg: #ffffff;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
-      --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
-      --radius: 8px;
+      --border-radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.05);
       --transition: all 0.2s ease;
     }
     
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
     
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding: 2rem;
-      max-width: 1100px;
+      max-width: 1000px;
       margin: 0 auto;
-    }
-    
-    .app-header {
-      margin-bottom: 2.5rem;
-      text-align: center;
-    }
-    
-    .app-title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.5px;
-    }
-    
-    .upload-area {
-      background-color: var(--card-bg);
-      border-radius: var(--radius);
       padding: 2rem;
-      margin-bottom: 3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: var(--shadow);
-    }
-    
-    .dropzone {
-      width: 100%;
-      max-width: 450px;
-      height: 180px;
-      border: 2px dashed #d4d4d8;
-      border-radius: var(--radius);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 1.5rem;
-      padding: 1.5rem;
-      text-align: center;
-      background-color: #fafafa;
-    }
-    
-    .dropzone:hover, .dropzone.active {
-      border-color: var(--accent);
-      background-color: var(--accent-light);
-    }
-    
-    .dropzone-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
-    }
-    
-    .dropzone-text {
-      color: var(--text-light);
-      font-size: 1rem;
       font-weight: 400;
     }
     
-    .file-input {
+    h1 {
+      font-weight: 600;
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+    
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .upload-box {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    
+    .file-input-container {
+      margin-bottom: 1.25rem;
+    }
+    
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-color: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .file-input-label:hover, .file-input-label.active {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+    }
+    
+    .file-input-label span {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .file-input-label svg {
+      width: 24px;
+      height: 24px;
+      color: var(--text-light);
+    }
+    
+    #fileInput {
       position: absolute;
-      width: 0.1px;
-      height: 0.1px;
+      width: 0;
+      height: 0;
       opacity: 0;
-      overflow: hidden;
-      z-index: -1;
     }
     
     .file-name {
@@ -112,111 +108,103 @@
       color: var(--text-light);
     }
     
-    .upload-btn {
-      background-color: var(--accent);
+    button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: var(--primary);
       color: white;
       border: none;
-      border-radius: 6px;
-      padding: 0.75rem 2rem;
-      font-size: 0.95rem;
-      font-weight: 500;
+      border-radius: var(--border-radius);
       cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      font-family: inherit;
       transition: var(--transition);
-      font-family: 'DM Sans', sans-serif;
     }
     
-    .upload-btn:hover {
-      filter: brightness(1.1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    button:hover {
+      filter: brightness(1.05);
     }
     
-    .upload-btn:active {
-      transform: translateY(0);
+    button:active {
+      filter: brightness(0.95);
     }
     
-    .upload-btn:disabled {
+    button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
     
     .gallery-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
+      align-items: center;
+      margin-bottom: 1rem;
     }
     
     .gallery-title {
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--text);
-      position: relative;
-    }
-    
-    .gallery-title::after {
-      content: "";
-      position: absolute;
-      bottom: -0.75rem;
-      left: 0;
-      width: 2.5rem;
-      height: 3px;
-      background-color: var(--accent);
-      border-radius: 2px;
     }
     
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
     }
     
     .gallery-item {
-      aspect-ratio: 1;
       overflow: hidden;
-      border-radius: var(--radius);
-      position: relative;
+      border-radius: var(--border-radius);
       box-shadow: var(--shadow);
       transition: var(--transition);
       background-color: var(--card-bg);
     }
     
     .gallery-item:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     .gallery-item img {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1;
       object-fit: cover;
       display: block;
       transition: var(--transition);
     }
     
     .gallery-item:hover img {
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
     
     .empty-gallery {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 4rem 2rem;
+      padding: 3rem 1rem;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
       color: var(--text-light);
-      background-color: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
     }
     
     .empty-icon {
-      font-size: 3rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
-      color: var(--accent);
       opacity: 0.7;
+    }
+    
+    .success-message {
+      background-color: #ecfdf5;
+      color: #065f46;
+      padding: 0.75rem;
+      border-radius: var(--border-radius);
+      margin-top: 0.75rem;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .toast {
@@ -225,13 +213,13 @@
       right: 2rem;
       background-color: #10b981;
       color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--border-radius);
       font-size: 0.9rem;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transform: translateY(100px);
       opacity: 0;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s ease;
       z-index: 1000;
     }
     
@@ -240,46 +228,57 @@
       opacity: 1;
     }
     
-    @media (max-width: 768px) {
+    @media (min-width: 768px) {
+      .app-container {
+        grid-template-columns: 300px 1fr;
+        align-items: start;
+      }
+      
+      button {
+        width: auto;
+      }
+    }
+    
+    @media (max-width: 600px) {
       body {
-        padding: 1.5rem 1rem;
+        padding: 1rem;
       }
       
       .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 1rem;
-      }
-      
-      .dropzone {
-        height: 150px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       }
     }
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <h1 class="app-title">Minimal Gallery</h1>
-  </header>
+  <div class="app-container">
+    <div class="upload-section">
+      <h1>Photo Sharing</h1>
+      <div class="upload-box">
+        <div class="file-input-container">
+          <label for="fileInput" class="file-input-label" id="dropzone">
+            <span id="dropzoneText">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Drop image here or click to browse
+            </span>
+          </label>
+          <input type="file" id="fileInput" accept="image/*"/>
+          <div class="file-name" id="fileName"></div>
+        </div>
+        <button id="uploadBtn" onclick="uploadImage()">Upload</button>
+      </div>
+    </div>
 
-  <main>
-    <section class="upload-area">
-      <label for="fileInput" class="dropzone" id="dropzone">
-        <div class="dropzone-icon">📷</div>
-        <div class="dropzone-text" id="dropzoneText">Drag image here or click to browse</div>
-        <div class="file-name" id="fileName"></div>
-      </label>
-      <input type="file" id="fileInput" class="file-input" accept="image/*"/>
-      <button id="uploadBtn" class="upload-btn" onclick="uploadImage()">Upload Image</button>
-    </section>
-
-    <section>
+    <div class="gallery-section">
       <div class="gallery-header">
         <h2 class="gallery-title">Gallery</h2>
       </div>
       <div class="gallery" id="gallery"></div>
-    </section>
-  </main>
-
+    </div>
+  </div>
+  
   <div id="toast" class="toast">Upload successful!</div>
 
   <script>
@@ -293,11 +292,21 @@
     fileInput.addEventListener('change', function() {
       if (this.files.length > 0) {
         fileName.textContent = this.files[0].name;
-        dropzoneText.textContent = 'Image selected';
+        dropzoneText.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Image selected
+        `;
         dropzoneText.style.fontWeight = '500';
       } else {
         fileName.textContent = '';
-        dropzoneText.textContent = 'Drag image here or click to browse';
+        dropzoneText.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Drop image here or click to browse
+        `;
         dropzoneText.style.fontWeight = 'normal';
       }
     });
@@ -390,7 +399,12 @@
           // Reset form
           fileInput.value = '';
           document.getElementById('fileName').textContent = '';
-          dropzoneText.textContent = 'Drag image here or click to browse';
+          dropzoneText.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Drop image here or click to browse
+          `;
           dropzoneText.style.fontWeight = 'normal';
           
           // Show success notification
@@ -534,10 +548,9 @@
         }
       }
     }
+    
     // Initialize gallery
     loadImages();
-    
- 
   </script>
 </body>
 </html>
