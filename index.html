@@ -452,9 +452,16 @@
       button.disabled = true;
       button.textContent = "Uploading...";
 
+      // Generate a unique temporary ID for this upload operation
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       try {
         const fileName = encodeURIComponent(file.name);
         const fileType = encodeURIComponent(file.type);
+
+        // Add local preview immediately with its temporary ID
+        const localPreviewUrl = URL.createObjectURL(file);
+        addImageToGallery(tempId, fileName, localPreviewUrl, true); // true indicates local preview
 
         const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
         const data = await res.json();
@@ -475,18 +482,24 @@
           // Show success toast
           showToast('Upload successful!', 'success');
           
-          // Add local preview
-          const localPreview = URL.createObjectURL(file);
-          addImageToGallery(fileName, localPreview);
+          // Now, find the local preview element and update its src to the permanent S3 URL
+          const permanentS3Url = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${file.name}?t=${Date.now()}`;
+          updateImageInGallery(tempId, permanentS3Url, file.name);
+
+          // Revoke the blob URL to free up memory
+          URL.revokeObjectURL(localPreviewUrl);
           
-          // Refresh gallery after delay
-          setTimeout(loadImages, 1000);
         } else {
           throw new Error('Upload failed');
         }
       } catch (error) {
         console.error("Upload error:", error);
         showToast('Upload failed. Please try again.', 'error');
+        // If upload fails, remove the temporary local preview
+        const tempElement = document.getElementById(tempId);
+        if (tempElement) {
+            tempElement.remove();
+        }
       } finally {
         // Reset button state
         button.disabled = false;
@@ -494,7 +507,8 @@
       }
     }
 
-    function addImageToGallery(key, src) {
+    // Function to add an image to the gallery (either local preview or S3 image)
+    function addImageToGallery(id, key, src, isLocalPreview = false) {
       const gallery = document.getElementById("gallery");
       
       // Remove "no images" message if it exists
@@ -503,10 +517,18 @@
         emptyMessage.remove();
       }
       
+      // Prevent adding if an element with this ID already exists
+      if (document.getElementById(id)) {
+          console.warn(`Attempted to add duplicate ID: ${id}`);
+          return;
+      }
+
       // Create gallery item
       const galleryItem = document.createElement("div");
       galleryItem.className = "gallery-item";
-      
+      galleryItem.id = id; // Assign the ID to the gallery item
+      galleryItem.dataset.key = key; // Store the original key (filename)
+
       // Create image container
       const imageContainer = document.createElement("div");
       imageContainer.className = "gallery-image-container";
@@ -516,7 +538,10 @@
       img.src = src;
       img.alt = "Uploaded photo";
       img.loading = "lazy";
-      img.dataset.key = key;
+      img.dataset.key = key; // Keep key on img for consistency
+      if (isLocalPreview) {
+          img.dataset.isLocal = "true"; // Mark as a local preview
+      }
       
       // Create overlay content
       const overlay = document.createElement("div");
@@ -525,7 +550,7 @@
       // Create title
       const title = document.createElement("div");
       title.className = "gallery-item-title";
-      title.textContent = key.split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
+      title.textContent = decodeURIComponent(key).split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
       
       // Create description
       const description = document.createElement("div");
@@ -535,7 +560,7 @@
       // Create date
       const date = document.createElement("div");
       date.className = "gallery-item-date";
-      date.textContent = "Uploaded just now";
+      date.textContent = isLocalPreview ? "Uploading..." : "Uploaded a while ago";
       
       // Build the card
       overlay.appendChild(title);
@@ -548,6 +573,25 @@
       // Add to gallery
       gallery.prepend(galleryItem);
     }
+
+    // Function to update an existing image in the gallery
+    function updateImageInGallery(id, newSrc, newKey) {
+        const galleryItem = document.getElementById(id);
+        if (galleryItem) {
+            const img = galleryItem.querySelector('img');
+            if (img) {
+                img.src = newSrc;
+                img.dataset.key = newKey; // Update key to official S3 key if different (though filename is usually consistent)
+                delete img.dataset.isLocal; // Remove local preview flag
+
+                // Update date text if it's the overlay
+                const dateElement = galleryItem.querySelector('.gallery-item-date');
+                if (dateElement) {
+                    dateElement.textContent = "Uploaded just now"; // Or a more dynamic date if you have one
+                }
+            }
+        }
+    }
    
     async function loadImages() {
       const gallery = document.getElementById("gallery");
@@ -556,19 +600,21 @@
       const refreshIcon = document.querySelector('.refresh-icon');
       refreshIcon.style.transform = 'rotate(360deg)';
       
-      // Clear existing images but keep local previews
-      const localPreviews = [];
-      gallery.querySelectorAll("img").forEach(img => {
-        if (img.src.startsWith('blob:')) {
-          localPreviews.push({
-            key: img.dataset.key,
-            element: img.closest('.gallery-item')
-          });
-        }
+      // Get current keys of images already displayed (successful S3 uploads)
+      // We no longer care about `data-is-local` for filtering, as local previews
+      // are meant to be updated in place.
+      const existingS3ImageKeys = new Set();
+      gallery.querySelectorAll(".gallery-item").forEach(item => {
+          // Only consider items that are not temporary local previews, or those that have completed
+          const img = item.querySelector('img');
+          if (img && !img.dataset.isLocal) { // Check if it's not a temporary local preview
+              existingS3ImageKeys.add(img.dataset.key);
+          }
       });
       
-      // Show loading state only if no images exist
-      if (gallery.children.length === 0) {
+      // Show initial loading state if gallery is effectively empty (only contains temp items or no items)
+      const visibleItems = gallery.querySelectorAll(".gallery-item:not([id^='temp-'])").length;
+      if (visibleItems === 0) {
         gallery.innerHTML = `
           <div class="gallery-empty">
             <span class="icon">🖼️</span>
@@ -584,74 +630,35 @@
         
         const imageKeys = data.images || [];
 
-        // Clear gallery
-        gallery.innerHTML = '';
-        
-        // Re-add local previews
-        localPreviews.forEach(preview => {
-          gallery.appendChild(preview.element);
-        });
-        
-        if (imageKeys.length === 0 && localPreviews.length === 0) {
-          gallery.innerHTML = `
-            <div class="gallery-empty">
-              <span class="icon">🖼️</span>
-              No photos yet. Upload your first image!
-            </div>
-          `;
-          return;
+        // Clear any previous "No photos" message if images are found
+        const emptyMessage = gallery.querySelector(".gallery-empty");
+        if (emptyMessage && imageKeys.length > 0) {
+            emptyMessage.remove();
         }
 
-        // Add fetched images
+        // Add fetched images that are not already permanent S3 images in the gallery
         imageKeys.forEach(key => {
-          // Skip if this is already a local preview
-          if (localPreviews.some(preview => preview.key === key)) return;
-          
-          const galleryItem = document.createElement("div");
-          galleryItem.className = "gallery-item";
-          
-          // Image container
-          const imageContainer = document.createElement("div");
-          imageContainer.className = "gallery-image-container";
-          
-          const img = document.createElement("img");
-          img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`;
-          img.alt = "Uploaded photo";
-          img.loading = "lazy";
-          
-          // Overlay content
-          const overlay = document.createElement("div");
-          overlay.className = "gallery-item-overlay";
-          
-          // Title
-          const title = document.createElement("div");
-          title.className = "gallery-item-title";
-          title.textContent = key.split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ');
-          
-          // Description
-          const description = document.createElement("div");
-          description.className = "gallery-item-description";
-          description.textContent = "Beautiful memory captured recently";
-          
-          // Date
-          const date = document.createElement("div");
-          date.className = "gallery-item-date";
-          date.textContent = "Uploaded a while ago";
-          
-          // Build the card
-          overlay.appendChild(title);
-          overlay.appendChild(description);
-          overlay.appendChild(date);
-          imageContainer.appendChild(img);
-          imageContainer.appendChild(overlay);
-          galleryItem.appendChild(imageContainer);
-          
-          gallery.appendChild(galleryItem);
+            if (!existingS3ImageKeys.has(key)) {
+                // Generate a stable ID for fetched images (e.g., based on their key)
+                const s3Id = `s3-${btoa(key).replace(/=/g, '')}`; // Base64 encode key for a valid ID
+                addImageToGallery(s3Id, key, `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`, false);
+            }
         });
+
+        // After processing, check if the gallery is truly empty
+        if (gallery.querySelectorAll(".gallery-item").length === 0) {
+            gallery.innerHTML = `
+                <div class="gallery-empty">
+                <span class="icon">🖼️</span>
+                No photos yet. Upload your first image!
+                </div>
+            `;
+        }
+
 
       } catch (error) {
         console.error("Error loading images:", error);
-        if (gallery.children.length === 0) {
+        if (gallery.querySelectorAll(".gallery-item").length === 0) {
           gallery.innerHTML = `
             <div class="gallery-empty">
               <span class="icon">⚠️</span>
@@ -665,7 +672,7 @@
       }
     }
     
-    // Initialize gallery
+    // Initialize gallery on page load
     loadImages();
   </script>
 </body>
