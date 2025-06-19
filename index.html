@@ -475,8 +475,9 @@
           // Show success toast
           showToast('Upload successful!', 'success');
           
-          // Refresh gallery after delay
-          setTimeout(loadImages, 1000);
+          // Wait for resized image to be ready, then load it
+         await new Promise(resolve => setTimeout(resolve, 1500));
+         await loadImages();
         } else {
           throw new Error('Upload failed');
         }
