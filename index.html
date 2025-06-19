@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Photo Sharing App</title>
+  <title>Photon - Image Gallery</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #3a86ff;
-      --primary-dark: #2667cc;
-      --text: #333;
-      --text-light: #666;
-      --bg: #f8f9fa;
-      --card-bg: #fff;
-      --border-radius: 12px;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --transition: all 0.3s ease;
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --primary-dark: #4338ca;
+      --accent: #f43f5e;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #f9fafb;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+      --transition: all 0.2s ease;
     }
     
     * {
@@ -27,78 +34,148 @@
     }
     
     body {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      max-width: 900px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+      font-weight: 400;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 2rem;
-      font-weight: 300;
+      padding: 0 1.5rem;
     }
     
-    h1 {
-      text-align: center;
-      font-weight: 500;
-      font-size: 2.4rem;
-      margin-bottom: 2rem;
-      color: var(--text);
-      letter-spacing: -0.5px;
+    header {
+      background-color: var(--card-bg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.25rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     
-    .upload-box {
-      background: var(--card-bg);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 2.5rem;
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    
+    .logo-icon {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      background-color: var(--primary);
+      border-radius: 6px;
+      position: relative;
+    }
+    
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 50%;
+      height: 50%;
+      background-color: white;
+      border-radius: 50%;
+    }
+    
+    main {
+      padding: 2rem 0;
+    }
+    
+    .upload-section {
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .upload-section::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .upload-section::after {
+      content: "";
+      position: absolute;
+      bottom: -30%;
+      left: 10%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    
+    .upload-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .upload-subtitle {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+      max-width: 500px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .upload-container {
       display: flex;
       flex-direction: column;
-      align-items: center;
-    }
-    
-    .file-input-container {
+      gap: 1rem;
       position: relative;
-      width: 100%;
-      max-width: 400px;
-      margin-bottom: 1.5rem;
-      text-align: center;
+      z-index: 1;
     }
     
-    .file-input-label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      background-color: #f0f4f8;
-      border: 2px dashed #ccd7e0;
-      border-radius: 8px;
+    .file-drop-area {
+      background-color: rgba(255,255,255,0.1);
+      border: 2px dashed rgba(255,255,255,0.3);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
       cursor: pointer;
       transition: var(--transition);
-      height: 120px;
-      width: 100%;
     }
     
-    .file-input-label:hover {
-      background-color: #e6edf5;
-      border-color: var(--primary);
+    .file-drop-area:hover {
+      background-color: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.5);
     }
     
-    .file-input-label span {
-      color: var(--text-light);
-      font-size: 0.95rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .file-input-label span:before {
-      content: "📷";
+    .file-icon {
       font-size: 2rem;
+      margin-bottom: 0.75rem;
     }
     
-    #fileInput {
+    .file-input {
       position: absolute;
       width: 0.1px;
       height: 0.1px;
@@ -107,188 +184,303 @@
       z-index: -1;
     }
     
+    .file-label {
+      font-size: 0.95rem;
+      display: block;
+    }
+    
     .file-name {
       margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--text-light);
+      font-size: 0.875rem;
+      opacity: 0.9;
     }
     
-    button {
-      padding: 0.8rem 2rem;
-      background-color: var(--primary);
-      color: white;
+    .upload-button {
+      background-color: white;
+      color: var(--primary);
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1.5rem;
       font-weight: 500;
-      font-size: 1rem;
-      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
       transition: var(--transition);
-      min-width: 160px;
-      letter-spacing: 0.5px;
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     
-    button:hover {
-      background-color: var(--primary-dark);
+    .upload-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
-    button:active {
+    .upload-button:active {
       transform: translateY(0);
     }
     
-    button:disabled {
+    .upload-button:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
     
-    .gallery-header {
+    .gallery-section {
+      margin-bottom: 3rem;
+    }
+    
+    .section-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     
-    .gallery-title {
-      font-size: 1.5rem;
-      font-weight: 500;
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
       color: var(--text);
-      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     
-    .gallery-title:after {
-      content: "";
-      position: absolute;
-      bottom: -0.75rem;
-      left: 0;
-      width: 3rem;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 2px;
-    }
-    
-    .gallery {
+    .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 1.5rem;
     }
     
-    .gallery-empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 4rem 2rem;
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      color: var(--text-light);
-      font-style: italic;
-      box-shadow: var(--shadow);
-    }
-    
-    .gallery-empty:before {
-      content: "🖼️";
-      display: block;
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      opacity: 0.7;
-    }
-    
     .gallery-item {
       position: relative;
+      border-radius: var(--radius-md);
       overflow: hidden;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
       background-color: var(--card-bg);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      aspect-ratio: 1;
     }
     
     .gallery-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
     }
     
-    .gallery img {
+    .gallery-img {
       width: 100%;
-      height: 250px;
+      height: 100%;
       object-fit: cover;
       transition: var(--transition);
-      display: block;
     }
     
-    .gallery-item:hover img {
+    .gallery-item:hover .gallery-img {
       transform: scale(1.05);
     }
     
-    .gallery-item:after {
-      content: "";
+    .gallery-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 40%;
-      background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      padding: 1.5rem 1rem 1rem;
+      color: white;
       opacity: 0;
+      transform: translateY(10px);
       transition: var(--transition);
     }
     
-    .gallery-item:hover:after {
+    .gallery-item:hover .gallery-overlay {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .gallery-actions {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: var(--transition);
+    }
+    
+    .gallery-item:hover .gallery-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .action-button {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.9);
+      color: var(--text);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    .action-button:hover {
+      background-color: white;
+      transform: scale(1.1);
+    }
+    
+    .empty-gallery {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 4rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary-light);
+    }
+    
+    .empty-text {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .empty-subtext {
+      color: var(--text-light);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background-color: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
       opacity: 1;
     }
     
-    .success-message {
-      background-color: #d4edda;
-      color: #155724;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      text-align: center;
+    .toast-icon {
+      font-size: 1.25rem;
     }
     
-    @media (max-width: 600px) {
-      body {
-        padding: 1rem;
+    .toast-message {
+      font-weight: 500;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .upload-section {
+        padding: 2rem 1.5rem;
       }
       
-      .upload-box {
-        padding: 1.5rem;
-      }
-      
-      .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 1rem;
       }
+    }
+    
+    @media (max-width: 480px) {
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.75rem;
+      }
       
-      .gallery img {
-        height: 150px;
+      .upload-title {
+        font-size: 1.25rem;
       }
     }
   </style>
 </head>
 <body>
-
-  <h1>Photo Sharing App</h1>
-
-  <div class="upload-box">
-    <div class="file-input-container">
-      <label for="fileInput" class="file-input-label">
-        <span id="fileLabel">Drag & drop image or click to browse</span>
-      </label>
-      <input type="file" id="fileInput" accept="image/*"/>
-      <div class="file-name" id="fileName"></div>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <span class="logo-icon"></span>
+        Photon
+      </div>
     </div>
-    <button onclick="uploadImage()">Upload Image</button>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="upload-section">
+        <h1 class="upload-title">Share your moments</h1>
+        <p class="upload-subtitle">Upload and share your photos with friends and family in just a few clicks.</p>
+        
+        <div class="upload-container">
+          <label for="fileInput" class="file-drop-area">
+            <div class="file-icon">📷</div>
+            <span id="fileLabel" class="file-label">Drag & drop image here or click to browse</span>
+            <div id="fileName" class="file-name"></div>
+          </label>
+          <input type="file" id="fileInput" class="file-input" accept="image/*"/>
+          
+          <button id="uploadButton" class="upload-button" onclick="uploadImage()">
+            <span>Upload Image</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="gallery-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Gallery
+          </h2>
+        </div>
+        
+        <div id="gallery" class="gallery-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message">Image uploaded successfully!</span>
   </div>
 
-  <div class="gallery-header">
-    <h2 class="gallery-title">Gallery</h2>
-  </div>
-  <div class="gallery" id="gallery"></div>
- 
   <script>
+    // File input handling
     document.getElementById('fileInput').addEventListener('change', function() {
       const fileName = document.getElementById('fileName');
       const fileLabel = document.getElementById('fileLabel');
@@ -299,20 +491,78 @@
         fileLabel.style.fontWeight = '500';
       } else {
         fileName.textContent = '';
-        fileLabel.textContent = 'Drag & drop image or click to browse';
+        fileLabel.textContent = 'Drag & drop image here or click to browse';
         fileLabel.style.fontWeight = 'normal';
       }
     });
     
+    // Drag and drop functionality
+    const dropArea = document.querySelector('.file-drop-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropArea.style.backgroundColor = 'rgba(255,255,255,0.2)';
+      dropArea.style.borderColor = 'rgba(255,255,255,0.6)';
+    }
+    
+    function unhighlight() {
+      dropArea.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      dropArea.style.borderColor = 'rgba(255,255,255,0.3)';
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      const fileInput = document.getElementById('fileInput');
+      
+      fileInput.files = files;
+      
+      // Trigger change event
+      const event = new Event('change');
+      fileInput.dispatchEvent(event);
+    }
+    
+    // Toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = toast.querySelector('.toast-message');
+      
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Upload functionality
     async function uploadImage() {
       const file = document.getElementById('fileInput').files[0];
       if (!file) return alert("Please select an image");
 
       // Disable button and show loading state
-      const button = document.querySelector('button');
-      const originalText = button.textContent;
+      const button = document.getElementById('uploadButton');
+      const originalText = button.innerHTML;
       button.disabled = true;
-      button.textContent = "Uploading...";
+      button.innerHTML = '<span class="loading"></span><span>Uploading...</span>';
 
       try {
         const fileName = encodeURIComponent(file.name);
@@ -332,23 +582,19 @@
           // Reset form
           document.getElementById('fileInput').value = '';
           document.getElementById('fileName').textContent = '';
-          document.getElementById('fileLabel').textContent = 'Drag & drop image or click to browse';
+          document.getElementById('fileLabel').textContent = 'Drag & drop image here or click to browse';
           document.getElementById('fileLabel').style.fontWeight = 'normal';
           
-          // Show success message
-          const successMessage = document.createElement("div");
-          successMessage.className = "success-message";
-          successMessage.textContent = "Upload successful!";
-          document.querySelector('.file-input-container').appendChild(successMessage);
+          // Show success notification
+          showToast("Image uploaded successfully!");
           
           // Add local preview
           const localPreview = URL.createObjectURL(file);
           addImageToGallery(fileName, localPreview);
           
-          // Remove success message after delay
+          // Refresh gallery after delay
           setTimeout(() => {
-            successMessage.remove();
-            loadImages(); // Refresh gallery
+            loadImages();
           }, 3000);
         } else {
           alert("Upload failed");
@@ -359,7 +605,7 @@
       } finally {
         // Reset button state
         button.disabled = false;
-        button.textContent = originalText;
+        button.innerHTML = originalText;
       }
     }
 
@@ -367,26 +613,45 @@
       const gallery = document.getElementById("gallery");
       
       // Remove "no images" message if it exists
-      const emptyMessage = gallery.querySelector(".gallery-empty");
-      if (emptyMessage) {
-        emptyMessage.remove();
+      const emptyGallery = gallery.querySelector(".empty-gallery");
+      if (emptyGallery) {
+        emptyGallery.remove();
       }
       
-      // Create gallery item container
+      // Create gallery item
       const galleryItem = document.createElement("div");
       galleryItem.className = "gallery-item";
       
-      // Create and add the image
+      // Create image
       const img = document.createElement("img");
       img.src = src;
       img.alt = "Uploaded photo";
+      img.className = "gallery-img";
       img.loading = "lazy";
       img.dataset.key = key;
       
-      // Add image to container
-      galleryItem.appendChild(img);
+      // Create overlay
+      const overlay = document.createElement("div");
+      overlay.className = "gallery-overlay";
+      overlay.textContent = "Just uploaded";
       
-      // Add container to gallery
+      // Create actions
+      const actions = document.createElement("div");
+      actions.className = "gallery-actions";
+      
+      const viewButton = document.createElement("button");
+      viewButton.className = "action-button";
+      viewButton.innerHTML = "👁️";
+      viewButton.title = "View full size";
+      
+      actions.appendChild(viewButton);
+      
+      // Add elements to gallery item
+      galleryItem.appendChild(img);
+      galleryItem.appendChild(overlay);
+      galleryItem.appendChild(actions);
+      
+      // Add to gallery
       gallery.prepend(galleryItem);
     }
    
@@ -395,18 +660,23 @@
       
       // Keep track of local previews
       const localPreviews = [];
-      gallery.querySelectorAll("img").forEach(img => {
+      gallery.querySelectorAll(".gallery-img").forEach(img => {
         if (img.dataset.key) {
           localPreviews.push({
             key: img.dataset.key,
-            element: img
+            element: img.closest('.gallery-item')
           });
         }
       });
       
       // Show loading indicator only if gallery is empty
-      if (!gallery.querySelector("img")) {
-        gallery.innerHTML = "<div class='gallery-empty'>Loading images...</div>";
+      if (!gallery.querySelector(".gallery-item")) {
+        gallery.innerHTML = `
+          <div class="empty-gallery">
+            <div class="empty-icon">⌛</div>
+            <div class="empty-text">Loading images...</div>
+          </div>
+        `;
       }
 
       try {
@@ -416,18 +686,24 @@
         const data = await response.json();
         
         // Clear gallery but preserve local previews
-        if (!gallery.querySelector("img")) {
+        if (!gallery.querySelector(".gallery-item")) {
           gallery.innerHTML = "";
         } else {
-          const loadingMsg = gallery.querySelector(".gallery-empty");
+          const loadingMsg = gallery.querySelector(".empty-gallery");
           if (loadingMsg) loadingMsg.remove();
         }
         
         const imageKeys = data.images;
 
         if (!imageKeys || imageKeys.length === 0) {
-          if (!gallery.querySelector("img")) {
-            gallery.innerHTML = "<div class='gallery-empty'>No images uploaded yet</div>";
+          if (!gallery.querySelector(".gallery-item")) {
+            gallery.innerHTML = `
+              <div class="empty-gallery">
+                <div class="empty-icon">🖼️</div>
+                <div class="empty-text">No images yet</div>
+                <p class="empty-subtext">Upload your first image to get started</p>
+              </div>
+            `;
           }
           return;
         }
@@ -436,17 +712,55 @@
         gallery.innerHTML = "";
         
         imageKeys.forEach(key => {
+          // Create gallery item
+          const galleryItem = document.createElement("div");
+          galleryItem.className = "gallery-item";
+          
+          // Create image
           const img = document.createElement("img");
           img.src = `https://photo-sharing-thumbnails-dev.s3.eu-west-1.amazonaws.com/${key}?t=${cacheBuster}`;
           img.alt = "Uploaded photo";
+          img.className = "gallery-img";
           img.loading = "lazy";
-          gallery.appendChild(img);
+          
+          // Create overlay
+          const overlay = document.createElement("div");
+          overlay.className = "gallery-overlay";
+          
+          // Extract filename from key for overlay
+          const filename = decodeURIComponent(key.split('/').pop().split('?')[0]);
+          overlay.textContent = filename.length > 20 ? filename.substring(0, 20) + '...' : filename;
+          
+          // Create actions
+          const actions = document.createElement("div");
+          actions.className = "gallery-actions";
+          
+          const viewButton = document.createElement("button");
+          viewButton.className = "action-button";
+          viewButton.innerHTML = "👁️";
+          viewButton.title = "View full size";
+          
+          actions.appendChild(viewButton);
+          
+          // Add elements to gallery item
+          galleryItem.appendChild(img);
+          galleryItem.appendChild(overlay);
+          galleryItem.appendChild(actions);
+          
+          // Add to gallery
+          gallery.appendChild(galleryItem);
         });
 
       } catch (error) {
         console.error("Error loading images:", error);
-        if (!gallery.querySelector("img")) {
-          gallery.innerHTML = "<div class='gallery-empty'>Failed to load images</div>";
+        if (!gallery.querySelector(".gallery-item")) {
+          gallery.innerHTML = `
+            <div class="empty-gallery">
+              <div class="empty-icon">⚠️</div>
+              <div class="empty-text">Failed to load images</div>
+              <p class="empty-subtext">Please try again later</p>
+            </div>
+          `;
         }
       }
     }
