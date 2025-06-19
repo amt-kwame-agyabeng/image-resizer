@@ -338,6 +338,31 @@
       color: #991b1b;
       border: 1px solid #fecaca;
     }
+    .card-spinner {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+    .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
     @media (max-width: 768px) {
       body {
@@ -390,7 +415,10 @@
         <input type="file" id="fileInput" accept="image/*">
         <div class="file-name" id="fileName"></div>
       </div>
-      
+      <div class="card-spinner hidden" id="cardSpinner">
+      <div class="spinner"></div>
+     </div>
+
       <button class="upload-btn" onclick="uploadImage()">Upload Photo</button>
     </div>
     
@@ -415,6 +443,15 @@
   <div class="toast" id="toast"></div>
  
   <script>
+
+    function showCardSpinner() {
+    document.getElementById('cardSpinner').classList.remove('hidden');
+}
+
+    function hideCardSpinner() {
+    document.getElementById('cardSpinner').classList.add('hidden');
+}
+
     // Show toast notification
     function showToast(message, type) {
       const toast = document.getElementById('toast');
@@ -451,6 +488,7 @@
       const originalText = button.textContent;
       button.disabled = true;
       button.textContent = "Uploading...";
+      showCardSpinner();
 
       try {
         const fileName = encodeURIComponent(file.name);
@@ -488,6 +526,8 @@
         // Reset button state
         button.disabled = false;
         button.textContent = originalText;
+        hideCardSpinner();
+
       }
     }
 
