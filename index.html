@@ -440,59 +440,52 @@
     });
     
     async function uploadImage() {
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) {
-        showToast('Please select an image first', 'error');
-        return;
-      }
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) {
+    showToast('Please select an image first', 'error');
+    return;
+  }
 
-      // Disable button and show loading state
-      const button = document.querySelector('.upload-btn');
-      const originalText = button.textContent;
-      button.disabled = true;
-      button.textContent = "Uploading...";
+  const button = document.querySelector('.upload-btn');
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Uploading...";
 
-      try {
-        const fileName = encodeURIComponent(file.name);
-        const fileType = encodeURIComponent(file.type);
+  try {
+    const fileName = encodeURIComponent(file.name);
+    const fileType = encodeURIComponent(file.type);
 
-        const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
-        const data = await res.json();
-        const uploadUrl = data.uploadUrl;
+    const res = await fetch(`https://nk0l4d7cel.execute-api.eu-west-1.amazonaws.com/test/getuploadurl?name=${fileName}&type=${fileType}`);
+    const data = await res.json();
+    const uploadUrl = data.uploadUrl;
 
-        const upload = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file
-        });
+    const upload = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: file
+    });
 
-        if (upload.ok) {
-          // Reset form
-          document.getElementById('fileInput').value = '';
-          document.getElementById('fileName').textContent = '';
-          document.getElementById('fileLabel').textContent = 'Drag & drop or click to browse';
-          
-          // Show success toast
-          showToast('Upload successful!', 'success');
-          
-          // Add local preview
-          const localPreview = URL.createObjectURL(file);
-          addImageToGallery(fileName, localPreview);
-          
-          // Refresh gallery after delay
-          setTimeout(loadImages, 1000);
-        } else {
-          throw new Error('Upload failed');
-        }
-      } catch (error) {
-        console.error("Upload error:", error);
-        showToast('Upload failed. Please try again.', 'error');
-      } finally {
-        // Reset button state
-        button.disabled = false;
-        button.textContent = originalText;
-      }
+    if (upload.ok) {
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileName').textContent = '';
+      document.getElementById('fileLabel').textContent = 'Drag & drop or click to browse';
+      
+      showToast('Upload successful! Thumbnail will appear shortly.', 'success');
+
+    
+      setTimeout(loadImages, 2000); 
+    } else {
+      throw new Error('Upload failed');
     }
+  } catch (error) {
+    console.error("Upload error:", error);
+    showToast('Upload failed. Please try again.', 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
 
     function addImageToGallery(key, src) {
       const gallery = document.getElementById("gallery");
