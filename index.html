@@ -475,10 +475,6 @@
           // Show success toast
           showToast('Upload successful!', 'success');
           
-          // Add local preview
-          const localPreview = URL.createObjectURL(file);
-          addImageToGallery(fileName, localPreview);
-          
           // Refresh gallery after delay
           setTimeout(loadImages, 1000);
         } else {
