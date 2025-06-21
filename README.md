@@ -1,6 +1,10 @@
 ## Image Resizer
 A serverless web app that allows users to upload images, which are automatically resized and stored in Amazon S3. The frontend is a static website hosted via AWS Amplify, and the backend runs on AWS Lambda via API Gateway.
 
+## Live Demo
+
+👉 [View the App](https://main.d1xklw3gl9yz97.amplifyapp.com)
+
 
 ## Features
 - Upload images via browser
