@@ -17,11 +17,11 @@ Application is live here - https://main.d1xklw3gl9yz97.amplifyapp.com
 
 
 ## Project Structure
-image-resizer/
-├── backend/        # Lambda function code (image processing)
-├── frontend/       # Static HTML, CSS, and JS files
-├── screenshots/    # screenshots
-└── README.md
+The project is organized into two main directories:
+
+- /frontend: Contains the HTML for the user interface
+- /backend: Contains the serverless AWS Lambda functions and API definitions
+
 
 ## Technologies Used
 Frontend: HTML, CSS, JavaScript
