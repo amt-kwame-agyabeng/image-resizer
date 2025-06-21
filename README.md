@@ -3,7 +3,7 @@ A serverless web app that allows users to upload images, which are automatically
 
 ## Live Demo
 
-👉 [View the App](https://main.d1xklw3gl9yz97.amplifyapp.com)
+Application is live here - https://main.d1xklw3gl9yz97.amplifyapp.com
 
 
 ## Features
@@ -67,8 +67,4 @@ JavaScript to your deployed API Gateway endpoint
 
 - Update the API endpoint URL in your frontend JavaScript.
 
-## SCreenshots
-![Amplify Frontend](./screenshots/amplify-frontend.png)
-![API Gateway](./screenshots/api-gateway.png)
-![photo-sharing-app-bucket](./screenshots/photo-sharing-app-bucket.png)
-![photo-sharing-thumbnail-bucket](./screenshots/photo-sharing%20thumbnails-bucket.png)
+
